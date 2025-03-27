@@ -1,0 +1,24 @@
+name: test
+
+on:
+  push:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+      
+      - name: Use private action
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.PRIVATE_ACTION_DEPLOY_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan github.com >> ~/.ssh/known_hosts
+          git clone ${{ secrets.PRIVATE_ACTION_REPO }} private-action
+
+      - name: Use private action
+        uses: ./private-action
+        with:
+          payload: '{"user":"abc"}'
